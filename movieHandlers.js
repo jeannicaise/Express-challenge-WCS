@@ -1,3 +1,5 @@
+const database = require("./database");
+
 const movies = [
   {
     id: 1,
@@ -26,19 +28,38 @@ const movies = [
 ];
 
 const getMovies = (req, res) => {
-  res.json(movies);
+
+  database
+  .query("select * from movies")
+  .then(([movies]) => {
+    res.json(movies);
+  })
+  .catch((err) => {
+    console.error(err);
+  });
 };
 
 const getMovieById = (req, res) => {
   const id = parseInt(req.params.id);
 
-  const movie = movies.find((movie) => movie.id === id);
 
-  if (movie != null) {
-    res.json(movie);
-  } else {
-    res.status(404).send("Not Found");
-  }
+  database
+  .query(`select * from movies where id = ?`,[id])
+  .then(([movies]) => {
+  const movie = movies.find((movie) => movie.id === id);
+    if (movie != null) {
+      res.json(movie);
+    } else {
+      res.status(404).send("Not Found");
+    }
+
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+
+
+  
 };
 
 module.exports = {
